@@ -1,0 +1,112 @@
+/*  GENERALES */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+  .container-fluid {
+    width: 100%;
+    height: 100%;
+    background: #06031D;
+    position: static;
+}
+
+/*#06031D*/
+
+/* LOGIN */
+.base{
+    width: 100%;
+    height: 100%;
+    background: #5ebd1a;
+    display: flex;  
+    justify-content: center;
+    background: url(../img/FondoPeaje.png), #06031D 20%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    line-height: 30px;
+  }
+  
+  .contend {
+    text-align: center;
+  }
+
+  .titulo {
+    width: 50%;
+    height: 60px;
+    position: relative;
+    top: 25%; 
+    left: 30%;
+  }
+  
+  #principal{
+    display: flex;
+    width: 633px;
+    height: 56px;
+    color: #ffffff;
+    text-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    font-family: Inter;
+    font-size: 50px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 2.5px;
+  }
+  
+  .container{
+    align-items: center;
+    padding-top: 20%;
+    height: 80%;
+    padding-left: 34%;
+  }
+
+  .card {
+    background: #ffffff;
+    color: #000000;
+    border-radius: 1rem;
+    margin-top: 25%; 
+    align-items: center;
+  }
+  
+  .card-body{
+    text-align:center;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  
+  #tituloform{
+    font-weight: bold;
+    margin-bottom: 0.5rem; 
+    text-transform: uppercase; 
+  }
+  
+  .btn {
+    background-color: #06031D;
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    font-size: 1.25rem;
+  }
+
+
+
+
+
+  #footer{
+    width: 100%;
+    height: 2%;
+  }
+  .loginbg{
+      width: auto;
+      height: auto;
+      flex-shrink: 0;
+      border-top: 1px solid #000;
+      background: #06031D;
+  }
+  
+  .imgbg{
+    width: 100vh;
+    height: 100vh;
+      flex-shrink: 0;
+      opacity: 0.20000000298023224;
+      background: #ff0000;
+      /*background: url(../img/FondoPeaje.png), lightgray 50% / cover no-repeat;*/
+  }

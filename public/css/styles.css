@@ -1,0 +1,366 @@
+/*  GENERALES */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.container-fluid {
+  width: 100%;
+  height: 100%;
+  background: #06031D;
+  position: static;
+}
+
+/************* ALARMAS *************/
+#Acontainer-fluid {
+  width: 100%;
+  height: 100%;
+  background: #dcdfd2;
+}
+
+.Abase{
+  width: 100%;
+  height: 100%;
+  display: flex;  
+}
+.titulo1{
+  display: flex;
+  width: 633px;
+  height: 56px;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #FFF;
+  text-align: center;
+  text-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  font-family: Inter;
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: 2.5px;
+}
+
+
+/* PARA LAS ALARMAS EN CAJAS Y DINAMICAS */
+.container-vias{
+  width: 90%;
+  height: auto;
+}
+
+.container-vias p{
+  text-align: center;
+  color: #000000;
+}
+.row {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+.rowvias{
+  margin-bottom: 1rem;
+  height: 98%;
+}
+
+[class*="col-"] {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  align-items: center;
+  background-color: rgba(86,61,124,.15);
+  /*border: 1px solid rgba(86,61,124,.2);*/
+  height: 30%;
+}
+.via{
+  background: #FFFFFF;
+}
+
+.elements{
+  margin: 0 5px 5px 15px;
+}
+
+.element{
+  background: #f7faff71;
+  align-items: center;
+}
+.img_element{
+  width: 50px;
+  height: 50px;
+  margin: 10px 5px 5px 20px;
+}
+
+
+/* PARA LA LISTA DE ALARMAS */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+}
+th {
+  background-color: #f2f2f2;
+  text-align: left;
+  padding: 8px;
+}
+
+tr {
+  border-bottom: 1px solid #ddd;
+}
+
+td {
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tr:hover {
+  background-color: #e0e0e0;
+}
+
+
+
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+
+#header{
+    width: auto;
+    height: auto;
+    background: #06031D;
+}
+
+#footer{
+  width: 100%;
+  height: 5%;
+}
+.loginbg{
+    width: auto;
+    height: auto;
+    flex-shrink: 0;
+    border-top: 1px solid #000;
+    background: #06031D;
+}
+
+.imgbg{
+  width: 100vh;
+  height: 100vh;
+    flex-shrink: 0;
+    opacity: 0.20000000298023224;
+    background: #ff0000;
+    /*background: url(../img/FondoPeaje.png), lightgray 50% / cover no-repeat;*/
+}
+
+
+
+
+/* PRIORIDAD DE IMAGENES DE LISTA DE ALARMAS */
+.priorityImg{
+  width: 34px; 
+  height: 32px;
+}
+td.textCell {
+  text-align: center; 
+}
+th.tittleCell{
+  text-align: center; 
+}
+
+
+
+/***** lista de alarmas *****/
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1000;
+  display: none;
+}
+
+.cointainer-vias-list{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.card{
+  width: 90%;
+  height: 80%;
+  margin: 50px auto;
+}
+
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+  color: #000;
+  bottom: 100%;
+}
+
+
+.custom-filter .data-filter-control{
+  color:black;
+}
+
+
+
+/*****TABLE CHECKBOX PARA LAS VIAS QUE COMPARTE CON LO DE ARRIBA *****/
+.cointainer-config {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.cointainer-config .card {
+  width: 35%;
+  height: 80%;
+  margin: 8px auto 30px 50px;
+} 
+
+
+.listVias {
+  width: 50%;
+  height: 90%;
+  max-height: 90%;
+  margin: 10px auto auto 10px;
+  /* overflow-y: auto; */
+}
+
+#formVias {
+  height: auto;
+  width: auto;
+  background: #fff;
+}
+
+.saveChanges {
+  width: 30%;
+  margin: 5px 5px; 
+  margin-left: auto; 
+
+}
+
+.holder {
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 3px 0 rgba(0, 0, 0, .1);
+  margin: 50px auto;
+  padding: 30px 20px 20px;
+  width: 400px;
+}
+
+
+
+#nameFilterForm{
+  height: auto;
+  width: auto;
+  background: #fff;
+}
+
+td{
+  border-bottom:1px solid #f6f6f6;
+  padding:5px 10px;
+}
+
+td:nth-child(2){
+  text-align: right;
+  width: 40px;
+}
+
+
+/*CHECKBOX PARA LAS VIAS CON ANIMACIONES ROJO/VERDE*/
+/* input[type=checkbox] {
+  cursor: pointer;
+  height: 30px;
+  margin:4px 0 0;
+  /* position: absolute;
+  opacity: 0;
+  width: 30px;
+  z-index: 2;
+}
+
+input[type=checkbox] + span {
+  background: #e74c3c;
+  border-radius: 50%;
+  box-shadow: 0 2px 3px 0 rgba(0,0,0,.1);
+  display: inline-block;
+  height: 30px;
+  margin:4px 0 0;
+  position:relative;
+  width: 30px;
+  transition: all .2s ease;
+}
+
+input[type=checkbox] + span::before, input[type=checkbox] + span::after{
+  background:#fff;
+  content:'';
+  display:block;
+  position:absolute;
+  width:4px;
+  transition: all .2s ease;
+}
+
+input[type=checkbox] + span::before{
+  height:16px;
+  left:13px;
+  top:7px;
+  -webkit-transform:rotate(-45deg);
+  transform:rotate(-45deg);
+}
+
+input[type=checkbox] + span::after{
+  height:16px;
+  right:13px;
+  top:7px;
+  -webkit-transform:rotate(45deg);
+  transform:rotate(45deg);
+}
+
+input[type=checkbox]:checked + span {
+  background:#2ecc71;			    
+}
+
+input[type=checkbox]:checked + span::before{
+  height: 9px;
+  left: 9px;
+  top: 13px;
+  -webkit-transform:rotate(-47deg);
+  transform:rotate(-47deg);
+}
+
+input[type=checkbox]:checked + span::after{
+  height: 15px;
+  right: 11px;
+  top: 8px;
+}
+
+input[type=submit] {
+  background-color: #2ecc71;
+  border: 0;
+  border-radius: 4px;
+  color: #FFF;
+  cursor: pointer;
+  display: inline-block;
+  font-size:16px;
+  text-align: center;
+  padding: 12px 20px 14px;
+} */
+
+
+

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Configuración</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.22.1/bootstrap-table.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/menu_style.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.22.1/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+    <script src="/js/functions.js"></script>
+
+</head>
+
+<body>
+    <div id="Acontainer-fluid">
+        <div class="Abase">
+            <!-- Para el menú -->
+            <div id="wrapper">
+                <script>
+                    document.getElementById('wrapper').innerHTML = sidemenu2();
+                </script>
+            </div>
+            <!-- Para la lista -->
+            <div class="cointainer-config">
+                <div class="card rounded shadow border-0">
+                    <table class="table-striped" id="tabla" data-checkbox-header="false"
+                        data-row-attributes="atributos">
+
+                        <thead>
+
+                        </thead>
+
+                        <tbody>
+                            <tr data-id="item-via">
+
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                    <button id="guardarCambios" class="btn btn-primary saveChanges" onclick="GuardarCambios()">Guardar
+                        Cambios</button>
+                    <button id="cancelar" class="btn btn-danger cancelChanges"
+                        onclick="CancelarCambios()">Cancelar</button>
+                    <button id="cancelar" class="btn btn-danger cancelChanges" onclick="Prueba()">Prueba soli</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        function atributos(row, index) {
+            return {
+                "class": "item-via"
+            };
+        }
+
+        function CargarTabla() {
+            console.log("El script se está ejecutando");
+            $.ajax({
+                url: "/seleccionVias",
+                type: "GET",
+                success: function (vias) {
+                    $('#tabla').bootstrapTable('destroy');
+                    $('#tabla').bootstrapTable({
+                        data: vias,
+                        checkboxHeader: false,
+                        columns: [{
+                            field: 'VIA',
+                            title: 'VIA',
+                            class: 'Prueba'
+                        },
+                        {
+                            checkbox: true,
+                            showSelectTitle: true,
+                            field: 'checked',
+                            title: 'CHECK',
+
+                        }],
+
+                    });
+                }
+            });
+
+        }
+
+        window.addEventListener('DOMContentLoaded', CargarTabla());
+
+
+        function CancelarCambios() {
+            $('#tabla').bootstrapTable('destroy');
+            CargarTabla();
+        }
+
+      
+        function GuardarCambios() {
+            
+            var seleccionados = $('#tabla').bootstrapTable('getSelections');
+            seleccionados.forEach(function (elemento) {
+                elemento.ACTIVE = 1;
+            });
+            
+            seleccionados2 = JSON.stringify(seleccionados);
+
+            console.log(seleccionados2);
+            console.log(typeof seleccionados2);
+
+
+            $.ajax({
+                url: '/seleccionVias',
+                type: 'PUT',
+                data: seleccionados2,
+                contentType: 'application/json',
+                success: function (data) {
+                    CargarTabla();
+                    
+                }
+            });
+        }
+
+        function Prueba() {
+            
+
+        }
+
+        
+
+        $("#menu-toggle").click(function (e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "child_process": "^1.0.2",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "http": "^0.0.1-security",
+    "javascript-stringify": "^2.1.0",
+    "knex": "^3.0.1",
+    "morgan": "^1.10.0",
+    "mssql": "^10.0.1",
+    "nodemon": "^3.0.1",
+    "path": "^0.12.7",
+    "socket.io": "^4.7.2",
+    "stringify": "^5.2.0"
+  },
+  "name": "prueba",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js",
+    "child": "nodemon server_Child.js"
+  }
+}
