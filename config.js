@@ -50,10 +50,10 @@ module.exports = {
             password: sv_password,
             database: sv_db,
         },
-        debug:{
-            packet: true,
-            payload: true,
-        },
+        // debug:{
+        //     packet: true,
+        //     payload: true,
+        // },
         options: {
             encrypt: false,
         },

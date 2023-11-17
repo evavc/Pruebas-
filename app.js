@@ -46,13 +46,13 @@ app
 
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
-  exec(`cd C:\Users\emvaldespino\OneDrive - Indra\Escritorio\Proy_Prueba`, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`);
-      return;
-    }
-    console.log(`stdout: ${stdout}`);
-    console.error(`stderr: ${stderr}`);
-  });
 });
 
+const spawn = require('child_process').spawn;
+
+const command = 'node';
+const parameters = [path.resolve('server_Child.js')];
+
+const child = spawn(command, parameters, {
+  stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ]
+});

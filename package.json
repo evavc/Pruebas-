@@ -10,10 +10,13 @@
     "knex": "^3.0.1",
     "morgan": "^1.10.0",
     "mssql": "^10.0.1",
+    "node-ipc": "^11.1.0",
     "nodemon": "^3.0.1",
     "path": "^0.12.7",
     "socket.io": "^4.7.2",
-    "stringify": "^5.2.0"
+    "stompit": "^1.0.0",
+    "stringify": "^5.2.0",
+    "xml2js": "^0.6.2"
   },
   "name": "prueba",
   "version": "1.0.0",

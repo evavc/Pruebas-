@@ -5,9 +5,7 @@ const path = require("path");
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
-const funcionP = require("./routes/prueba");
-const getList = require("./routes/listAlarms");
-const { fork } = require("child_process");
+
 const { exec } = require("child_process");
 
 app.use(bodyParser.json());
@@ -22,12 +20,16 @@ app.use(express.static(path.join(__dirname, "public")));
 const hostname = "localhost";
 const port = 7000;
 
+
+const { fork } = require("child_process");
+const child = fork("./child.js");
+const childF = require("./child");
+
+
 server.listen(port, hostname, () => {
-  const child = fork("./child.js");
-  console.log("Corriendo child_server");
+  //const child = fork("./child.js");
+  childF.connectAMQ();
   console.log(`Server running at http://${hostname}:${port}/`);
-  child.on("exit",(code) => {
-    console.log("Server exited",code);
-  })
 });
+
 
