@@ -85,7 +85,7 @@ async function connectAMQ() {
 
       // process.send({tipo: 1,dato: `Iniciando conexión con el servidor: ${_host.HOST}`});
       //process.stdout.write("conexion iniciada");
-      
+
       // Suscripción al servidor
       client.subscribe(connectionConfig, (err, msg) => {
         if (err) {
@@ -115,14 +115,14 @@ async function connectAMQ() {
   });
 }
 
-// async function reinicioConexion(client) {
-//   console.log(`en proceso a cerrar conexion`);
-//   client.disconnect(() => {
-//     console.log("Desconectando...");
-//     process.send({ tipo: 1, dato: "Desconectando..." });
-//     return;
-//   });
-// }
+async function reinicioConexion(client) {
+  console.log(`en proceso a cerrar conexion`);
+  client.disconnect(() => {
+    console.log("Desconectando...");
+    process.send({ tipo: 1, dato: "Desconectando..." });
+    return;
+  });
+}
 
 
 async function parseXml(body) {
