@@ -100,11 +100,24 @@
 
 
         function CancelarCambios() {
-            $('#tabla').bootstrapTable('destroy');
-            CargarTabla();
+           // $('#tabla').bootstrapTable('destroy');
+           // CargarTabla();
+           console.log("boton presionado");
+           $.ajax({
+            url: '/pruebacierre',
+            type: 'GET',
+            success: function (data) {
+                alert("cerrando proceso");
+                console.log("Cierre",data);
+                CargarTabla();
+            },
+            error: function (xhr, status, error){
+                console.log("Error" + error);
+            }
+            
+        });
         }
 
-      
         function GuardarCambios() {
             
             var seleccionados = $('#tabla').bootstrapTable('getSelections');
@@ -112,27 +125,20 @@
                 elemento.ACTIVE = 1;
             });
             
-            seleccionados2 = JSON.stringify(seleccionados);
-
-            console.log(seleccionados2);
-            console.log(typeof seleccionados2);
-
+            seleccionadosJSON = JSON.stringify(seleccionados);
 
             $.ajax({
                 url: '/seleccionVias',
                 type: 'PUT',
-                data: seleccionados2,
+                data: seleccionadosJSON,
                 contentType: 'application/json',
                 success: function (data) {
-                    CargarTabla();
-                    
+                    CargarTabla();        
                 }
             });
         }
 
         function Prueba() {
-            
-
         }
 
         

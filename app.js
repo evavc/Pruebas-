@@ -7,17 +7,12 @@ const http = require("http");
 const server = http.createServer(app);
 const funcionP = require("./routes/prueba");
 const getList = require("./routes/listAlarms");
-const { fork } = require("child_process");
-const { exec } = require("child_process");
-
+const funcionC = require("./child");
 app.use(bodyParser.json());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configuración del motor de vistas y directorios de vistas
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "/views"));
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -25,18 +20,16 @@ const hostname = "localhost";
 const port = 3000;
 
 app.get("/", (req, res) => {
- res.sendFile(path.join(__dirname, "./html/prueba.html"));
+  res.sendFile(path.join(__dirname, "./html/prueba.html"));
 });
 
 app.use("/", getList);
 
-
-app
-  .route("/seleccionVias")
+app.route("/seleccionVias")
   .get(async (req, res) => {
     let vias = await funcionP.ObtenerActivas();
-    console.log(vias);
-    res.send(vias);
+    //console.log(vias);
+    res.send(vias);  
   })
   .put(async (req, res) => {
     let seleccionados = req.body;
@@ -44,15 +37,56 @@ app
     res.send(seleccionados);
   });
 
+
+  app.route("/pruebacierre")
+  .get(async (req, res) => {
+    console.log("Cerrando proceso");
+    child.kill("SIGKILL"); 
+    res.send("hijo cerrrado");
+  });
+
+
+
+
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
 
-const spawn = require('child_process').spawn;
+const { fork } = require("child_process");
+  var program = path.resolve("child.js");
+  const parameters = [];
+  const options = {
+    stdio: ["pipe", "pipe", "pipe", "ipc"],
+  }
+const child = fork(program, parameters, options);
 
-const command = 'node';
-const parameters = [path.resolve('server_Child.js')];
+child.on("message", (message) => {
+  if (message.tipo == 1){
+    console.log(message.dato);
+  }else if(message.tipo ==2){
+    console.log(message.dato);
+  }else if(message.tipo ==3){
+    clientChild = message.dato;
+  }
+}); 
 
-const child = spawn(command, parameters, {
-  stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ]
+child.on("error", (err) =>{
+  console.error(err); 
+})
+
+child.on("exit", (signal) => {
+  console.log(`Proceso hijo cerrado. Señal: ${signal}`);
+  console.log("Antes de reiniciar en el evento exit");
+  setTimeout(() => {
+    //child = fork(program, parameters, options);
+    console.log("Después de reiniciar en el evento exit");
+    
+  }, 1000);
 });
+
+
+async function Reinicio(){
+  console.log('Reiniciando');	
+  child.kill("SIGKILL"); 
+  //child = fork(program, parameters, options);
+}

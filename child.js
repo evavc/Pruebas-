@@ -1,5 +1,4 @@
 const express = require("express");
-const router = express.Router();
 const stompit = require("stompit");
 const xml2js = require("xml2js");
 const config = require("./config");
@@ -7,114 +6,130 @@ const knex = require("knex");
 const knexConnection = knex(config.knex);
 const path = require("path");
 const funcion = require("./funcionesGenerales");
+const app = express();
+const http = require("http");
+const server = http.createServer(app);
+
+const hostname = "localhost";
+const port = 7000;
+
+var checkID = 0;
+var checkType = 0;
+var arrID_PLACE = [];
+var arrID = [];
+var arrType = [];
 
 
 
-// router.get("/Alarmas", async (req, res) => {
-//   try {
-//     res.sendFile(path.resolve("public", "html", "alarmas.html"));
+server.listen(
+  port, hostname, async () => {
+    console.log(`Server running at http://${hostname}:${port}/`);
+    connectAMQ();
+    await RevisionInicial();
+  }
+);
 
-//     // lista de hosts desde la función de conexión
-//     const hosts = await connectHostsAMQ();
-
-//     // manejar todas las conexiones y suscripciones
-//     const connections = hosts.map((host) => connectAMQ(host));
-
-//     // Esperar a que todas las conexiones y suscripciones se completen
-//     await Promise.all(connections);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// });
-
-console.log("ejecutando al hijo");
-
-let contador = 0;
-
-
-async function connectHostsAMQ() {
-  const [servers] = await funcion.Seleccionar("SV_QUERIES", "QUERY", { NAME: "getHosts" }); 
-  return servers;     
-}
-
-
-async function connectAMQ() {
-  
-  const {QUERY} = await connectHostsAMQ();
-  const hosts  = await knexConnection.raw(QUERY); 
-
-  console.log(hosts.map(row => row.HOST));
-  
-
-  hosts.forEach((_host) => {
-    return new Promise((resolve, reject) => {
-    
-      // Configuración de conexión
-      const connectionConfig = {
-        destination: config.amq.destination,
-        host: _host.HOST,
-        port: config.amq.port,
-      };
-  
-      // Conexión al servidor
-      
-      stompit.connect(connectionConfig, (err, client) => {
-        if (err) {
-          console.error(`No se pudo establecer conexión con el servidor ${_host.HOST}`);
-          console.error(err);
-          reject(err);
-          return;
-        }
-
-        // Suscripción al servidor
-        client.subscribe(connectionConfig, (err, msg) => {
-          if (err) {
-            console.error(`Error en la conexión con el servidor ${_host.HOST}: ${err}`);
-            reject(err); 
-            return;
-          }
-  
-          // Lectura del mensaje
-          msg.readString("UTF-8", async (err, body) => {
-            if (err) {
-              console.error(`Error al leer mensaje del servidor ${_host.HOST}: ${err}`);
-              reject(err); 
-              return;
-            }
-  
-            console.log(`Mensaje recibido de ${_host.HOST}`);
-            parseBody(body); // Procesar el cuerpo del mensaje
-            resolve(); // Resolver la promesa después de procesar el mensaje
-          });
-          
-        });
-
-      });
-    });
-  });
-
-  console.log("Obtuve las ip para las conexiones AMQ");
-  
-}
-
-
-
-function parseBody(body, res) {
+async function RevisionInicial() {
   try {
-    contador++;
-    console.log(contador);
-    parseXml(body);
+    checkID = await funcion.Seleccionar("SV_VIAS", ["ID_PLACE"], {
+      ACTIVE: "1",
+    });
+    for (item of checkID) {
+      arrID_PLACE.push(item.ID_PLACE);
+    }
+
+    checkType = await funcion.Seleccionar("TYPES_ELEMENTS", [
+      "ID_ELEM",
+      "TYPE",
+    ]);
+    for (item of checkType) {
+      arrID.push(item.ID_ELEM);
+      arrType.push(item.TYPE);
+    }
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Error al analizar el XML");
+    console.error("Error al verificar el ID en la tabla", err);
+    return false;
   }
 }
+
+async function connectHostsAMQ() {
+  const [servers] = await funcion.Seleccionar("SV_QUERIES", "QUERY", {
+    NAME: "getHosts",
+  });
+  return servers;
+}
+
+async function connectAMQ() {
+  const { QUERY } = await connectHostsAMQ();
+  const hosts = await knexConnection.raw(QUERY);
+
+  console.log(hosts.map((row) => row.HOST));
+
+  hosts.forEach((_host) => {
+    // Configuración de conexión
+    const connectionConfig = {
+      destination: config.amq.destination,
+      host: _host.HOST,
+      port: config.amq.port,
+    };
+
+    // Conexión al servidor
+    stompit.connect(connectionConfig, (err, client) => {
+      if (err) {
+        console.error(
+          `No se pudo establecer conexión con el servidor ${_host.HOST}`
+        );
+        console.error(err);
+        return;
+      }
+
+      // process.send({tipo: 1,dato: `Iniciando conexión con el servidor: ${_host.HOST}`});
+      //process.stdout.write("conexion iniciada");
+      
+      // Suscripción al servidor
+      client.subscribe(connectionConfig, (err, msg) => {
+        if (err) {
+          console.error(
+            `Error en la conexión con el servidor ${_host.HOST}: ${err}`
+          );
+
+          return;
+        }
+        // Lectura del mensaje
+        msg.readString("UTF-8", async (err, body) => {
+          if (err) {
+            console.error(
+              `Error al leer mensaje del servidor ${_host.HOST}: ${err}`
+            );
+
+            return;
+          }
+          console.log(`Mensaje recibido de ${_host.HOST}`);
+          // process.send({ tipo: 1, dato: `Mensaje recibido de ${_host.HOST}` });
+          parseXml(body);
+        });
+      });
+      
+    });
+    return;
+  });
+}
+
+// async function reinicioConexion(client) {
+//   console.log(`en proceso a cerrar conexion`);
+//   client.disconnect(() => {
+//     console.log("Desconectando...");
+//     process.send({ tipo: 1, dato: "Desconectando..." });
+//     return;
+//   });
+// }
+
 
 async function parseXml(body) {
   try {
     const result = await xml2js.parseStringPromise(body);
     const json = JSON.stringify(result);
-    console.log("\x1b[32m%s\x1b[0m", json);
+    //console.log("\x1b[32m%s\x1b[0m", json);
 
     const datos = JSON.parse(json);
 
@@ -133,9 +148,9 @@ async function parseXml(body) {
       const knexConnection = await knex(config.knex);
 
       if (alarmas != undefined) {
-        await insertAlarmas(ins_alarmas, knexConnection);
+        await RevisionAlarmas(ins_alarmas);
       } else {
-        await insertParametros(ins_parametro, knexConnection);
+        await RevisionParametros(ins_parametro);
       }
     }
   } catch (err) {
@@ -143,9 +158,44 @@ async function parseXml(body) {
   }
 }
 
+async function RevisionAlarmas(alarma) {
+  if (arrID_PLACE.indexOf(alarma.ID_PLACE) >= 0) {
+    if (arrType.indexOf(parseInt(alarma.TYPE_ALARM)) >= 0) {
+      await funcion.Insertar("H_ALARMS", {
+        ID_PLACE: alarma.ID_PLACE,
+        TYPE_ELEM: alarma.TYPE_ELEM,
+        TYPE_ALARMS: alarma.TYPE_ALARM,
+        ID_ALARM: alarma.ID_ALARM,
+        STATUS_ALARM: alarma.STATUS_ALARM,
+        DATE_UTC: alarma.DATE_UTC,
+        ID_PARAM: alarma.ID_PARAM,
+        VALUE_PARAM: alarma.VALUE_PARAM,
+      });
+
+      // process.send({ tipo: 1, dato: alarma });
+    }
+  }
+}
+
+async function RevisionParametros(parametro) {
+  if (arrID_PLACE.indexOf(parametro.ID_PLACE) >= 0) {
+    if (arrType.indexOf(parseInt(parametro.TYPE_ELEM)) >= 0) {
+      await funcion.Insertar("H_PARAMS_ALARMS", {
+        ID_PLACE: parametro.ID_PLACE,
+        TYPE_ELEM: parametro.TYPE_ELEM,
+        STATUS_ELEM: parametro.STATUS_ELEM,
+        ID_PARAM: parametro.ID_PARAM,
+        VALUE_PARAM: parametro.VALUE_PARAM,
+        TYPE_PARAM: parametro.TYPE_PARAM,
+      });
+      // process.send({ tipo: 1, dato: parametro });
+    }
+  }
+}
+
 function ParametrosObj(elemento, parametros) {
   const ins_parametro = {
-    ID_PLACE: elemento.Id,
+    ID_PLACE: elemento.Id.substring(0, 8),
     TYPE_ELEM: elemento.Type,
     STATUS_ELEM: elemento.State,
   };
@@ -161,12 +211,11 @@ function ParametrosObj(elemento, parametros) {
     ins_parametro.TYPE_PARAM = type_parametro;
   }
   return ins_parametro;
-  
 }
 
 function AlarmasObj(elemento, alarmas) {
   const ins_alarmas = {
-    ID_PLACE: elemento.Id,
+    ID_PLACE: elemento.Id.substring(0, 8),
     TYPE_ELEM: elemento.Type,
   };
 
@@ -192,101 +241,4 @@ function AlarmasObj(elemento, alarmas) {
   return ins_alarmas;
 }
 
-//Funcion solo para comparacion de place y type_elem en el caso de ser parametro, la diferencia esta en el tipo de elementos que toma
-async function checkTypeElem(id_place, type, knexConnection) {
-  try {
-    const [checkPlaces, checkTypeElemt] = await Promise.all([
-      knexConnection("SV_VIAS")
-        .where("ID_PLACE", id_place.substring(0, 8))
-        .first(),
-      knexConnection("TYPES_ELEMENTS")
-        .where("TYPE", type)
-        .first()
-    ]);
-
-    return !!checkPlaces && !!checkTypeElemt;
-  } catch (err) {
-    console.error("Error al verificar el ID en la tabla", err);
-    return false;
-  }
-}
-
-//Funcion para la insercion de los parametros si cumplen con la comparacion del lugar y el elemento
-async function insertParametros(ins_parametro, knexConnection) {
-  try {
-    const checkTypeE = await checkTypeElem(
-      ins_parametro.ID_PLACE,
-      ins_parametro.TYPE_ELEM,
-      knexConnection
-    );
-
-    if (checkTypeE) {
-      const dupliparams = await knexConnection("H_PARAMS_ALARMS")
-        .where({
-          ID_PLACE: ins_parametro.ID_PLACE,
-          TYPE_ELEM: ins_parametro.TYPE_ELEM,
-          ID_PARAM: ins_parametro.ID_PARAM,
-          VALUE_PARAM: ins_parametro.VALUE_PARAM,
-        })
-        .first();
-      if (dupliparams) {
-        return; 
-      }
-
-      await knexConnection.transaction(async (trx) => {
-        await trx("H_PARAMS_ALARMS").insert(ins_parametro);
-      });
-    } else {
-      console.log(`El ID ${ins_parametro.ID_PLACE} no existe en la tabla`);
-    }
-    
-  } catch (err) {
-    
-  } finally {
-    knexConnection.destroy();
-  }
-}
-
-
-//Funcion solo para comparacion de place y type_elem en el caso de ser alarmas
-async function checkTypeF(type_alarm, id_place, knexConnection) {
-  try {
-    const [checkType, checkPlaces] = await Promise.all([
-      knexConnection("TYPES_ELEMENTS")
-        .where("ID_ELEM", type_alarm)
-        .first(),
-      knexConnection("SV_VIAS")
-        .where("ID_PLACE", id_place.substring(0, 8))
-        .first(),
-    ]);
-
-    return !!checkType && !!checkPlaces;
-  } catch (err) {
-    console.error("Error al verificar el ID en la tabla", err);
-    return false;
-  }
-}
-
-//Funcion para la insercion de alarmas si cumplen con las comparaciones de place y type_elem
-async function insertAlarmas(ins_alarmas, knexConnection) {
-  try {
-    const checkTypeE = await checkTypeF(ins_alarmas.TYPE_ALARM, ins_alarmas.ID_PLACE, knexConnection
-    );
-
-    if (checkTypeE) {
-      await knexConnection.transaction(async (trx) => {
-        await trx("H_ALARMS").insert(ins_alarmas);
-      });
-    } else {
-      console.log(
-        `El ID ${ins_alarmas.TYPE_ALARM} o ${ins_alarmas.ID_PLACE} no existen en la tabla`
-      );
-    }
-  } catch (err) {
-    console.error(err);
-  } finally {
-    knexConnection.destroy();
-  }
-}
-
-module.exports ={connectAMQ, };
+module.exports = { connectAMQ, /*reinicioConexion*/ };
