@@ -38,12 +38,6 @@ app.route("/seleccionVias")
   });
 
 
-  app.route("/pruebacierre")
-  .get(async (req, res) => {
-    console.log("Cerrando proceso");
-    child.kill("SIGKILL"); 
-    res.send("hijo cerrrado");
-  });
 
 
 
@@ -52,13 +46,25 @@ server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
 
-const { fork } = require("child_process");
-  var program = path.resolve("child.js");
-  const parameters = [];
-  const options = {
-    stdio: ["pipe", "pipe", "pipe", "ipc"],
-  }
-const child = fork(program, parameters, options);
+
+// const { fork } = require("child_process");
+//   var program = path.resolve("child.js");
+//   const parameters = [];
+//   const options = {
+//     stdio: ["pipe", "pipe", "pipe", "ipc"],
+//   }
+// const child = fork(program, parameters, options);
+
+const { spawn } = require("child_process");
+const command = "node";
+const program = path.resolve("child.js");
+const options = {
+  stdio: ["pipe", "pipe", "pipe", "ipc"],
+  detached: true,
+}
+
+let child = spawn(command,[program], options);
+
 
 child.on("message", (message) => {
   if (message.tipo == 1){
@@ -70,23 +76,36 @@ child.on("message", (message) => {
   }
 }); 
 
+child.on("close", function(code){
+  console.log("proceso hijo cerrado", code);
+});
+
 child.on("error", (err) =>{
   console.error(err); 
 })
 
-child.on("exit", (signal) => {
-  console.log(`Proceso hijo cerrado. Señal: ${signal}`);
-  console.log("Antes de reiniciar en el evento exit");
+process.on("SIGINT", () => {
+  console.log("Recibida señal SIGINT en el proceso padre");
+  child.kill("SIGTERM");
+  process.exit();
+});
+
+app.route("/pruebacierre")
+.get(async (req, res) => {
+  console.log("Cerrando proceso");
+  child.kill("SIGTERM");
   setTimeout(() => {
-    //child = fork(program, parameters, options);
-    console.log("Después de reiniciar en el evento exit");
-    
+    console.log("Cierre del proceso hijo");
+    res.send("proceso cerrado");
+    process.exit();
   }, 1000);
 });
 
 
+
 async function Reinicio(){
-  console.log('Reiniciando');	
-  child.kill("SIGKILL"); 
+  // console.log('Reiniciando');	
+  // child.kill("SIGKILL"); 
   //child = fork(program, parameters, options);
+
 }

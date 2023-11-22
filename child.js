@@ -26,6 +26,7 @@ server.listen(
     console.log(`Server running at http://${hostname}:${port}/`);
     connectAMQ();
     await RevisionInicial();
+    //await cerrar();
   }
 );
 
@@ -115,14 +116,13 @@ async function connectAMQ() {
   });
 }
 
-async function reinicioConexion(client) {
-  console.log(`en proceso a cerrar conexion`);
-  client.disconnect(() => {
-    console.log("Desconectando...");
-    process.send({ tipo: 1, dato: "Desconectando..." });
-    return;
-  });
-}
+// async function cerrar(client) {
+//   process.on("SIGTERM", () => {
+//     console.log("Recibida señal SIGTERM en el proceso hijo");
+//     process.send({ tipo: 1, dato: "Desconectando..." });
+//     process.exit();
+//   });
+// }
 
 
 async function parseXml(body) {
