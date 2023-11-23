@@ -18,17 +18,14 @@ var checkType = 0;
 var arrID_PLACE = [];
 var arrID = [];
 var arrType = [];
+let client;
 
-
-
-server.listen(
-  port, hostname, async () => {
-    console.log(`Server running at http://${hostname}:${port}/`);
-    connectAMQ();
-    await RevisionInicial();
-    //await cerrar();
-  }
-);
+server.listen(port, hostname, async () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+  connectAMQ();
+  await RevisionInicial();
+  //cerrar();
+});
 
 async function RevisionInicial() {
   try {
@@ -75,7 +72,7 @@ async function connectAMQ() {
     };
 
     // Conexión al servidor
-    stompit.connect(connectionConfig, (err, client) => {
+    stompit.connect(connectionConfig, (err, _client) => {
       if (err) {
         console.error(
           `No se pudo establecer conexión con el servidor ${_host.HOST}`
@@ -87,6 +84,7 @@ async function connectAMQ() {
       // process.send({tipo: 1,dato: `Iniciando conexión con el servidor: ${_host.HOST}`});
       //process.stdout.write("conexion iniciada");
 
+      client = _client;
       // Suscripción al servidor
       client.subscribe(connectionConfig, (err, msg) => {
         if (err) {
@@ -96,6 +94,9 @@ async function connectAMQ() {
 
           return;
         }
+
+        
+
         // Lectura del mensaje
         msg.readString("UTF-8", async (err, body) => {
           if (err) {
@@ -109,20 +110,30 @@ async function connectAMQ() {
           // process.send({ tipo: 1, dato: `Mensaje recibido de ${_host.HOST}` });
           parseXml(body);
         });
+        
       });
-      
+
     });
     return;
   });
 }
 
-// async function cerrar(client) {
-//   process.on("SIGTERM", () => {
-//     console.log("Recibida señal SIGTERM en el proceso hijo");
-//     process.send({ tipo: 1, dato: "Desconectando..." });
-//     process.exit();
-//   });
-// }
+
+function cerrar() {
+  console.log("Recibida señal para cerrar el proceso hijo");
+  if (client && client.connected) {
+    console.log("Cerrando la conexión STOMP");
+    client.disconnect();
+    console.log("Conexión STOMP cerrada");
+  } else {
+    console.log("No hay conexión STOMP para cerrar");
+  }
+
+  process.exit();
+}
+
+
+
 
 
 async function parseXml(body) {
@@ -241,4 +252,4 @@ function AlarmasObj(elemento, alarmas) {
   return ins_alarmas;
 }
 
-module.exports = { connectAMQ, /*reinicioConexion*/ };
+module.exports = { connectAMQ, cerrar, /*reinicioConexion*/ };
